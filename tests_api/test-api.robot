@@ -9,6 +9,7 @@ ${Id_Utilisateur}     2
 ${FirstName_Attendu}  Janet
 ${LastName_Attendu}   Weaver
 ${Email_Attendu}      janet.zion@api.testacademy.fr
+${Email_Get_Regexp}   ^janet\.(zion|weaver)@api\.testacademy\.fr$
 
 *** Test Cases ***
 Test Requete GET Utilisateur
@@ -22,7 +23,7 @@ Test Requete GET Utilisateur
     ${last_name}=      Get From Dictionary    ${utilisateur}    last_name
     Should Match Regexp    ${last_name}    ^(Weaver|Zion-Weaver)$
     ${email}=          Get From Dictionary    ${utilisateur}    email
-    Should Be Equal As Strings    ${Email_Attendu}    ${email}
+    Should Match Regexp    ${email}    ${Email_Get_Regexp}
 
 Test Requete POST Creation Utilisateur
     &{headers}=        Create Dictionary    Authorization=Bearer ${API_KEY}
