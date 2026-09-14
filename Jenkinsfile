@@ -4,7 +4,7 @@ pipeline {
         stage('1. Install Dependances') {
             steps {
                 echo 'Installation des librairies'
-                bat 'python -m pip install -r tests-unitaire\requirements.txt'
+                bat 'python -m pip install -r requirements.txt'
             }
         }
         stage('2. Lancer Tous Les Tests') {

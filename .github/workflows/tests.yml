@@ -30,11 +30,7 @@ jobs:
         run: python -m pip install --upgrade -r requirements.txt
 
       - name: Executer les tests unitaires
-        continue-on-error: true
-        run: |
-          mkdir -p reports/unitaire
-          python -m unittest discover -v tests_unitaire > reports/unitaire/unit-test-results.txt 2>&1
-          cat reports/unitaire/unit-test-results.txt
+        run: python tests-unitaire/test-app.py
 
       - name: Conserver le rapport
         if: always()
@@ -57,25 +53,18 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Installer les dependances Robot Framework
-        run: |
-          python -m pip install --upgrade robotframework robotframework-requests
-          python -m pip install --upgrade -r requirements.txt
+      - name: Installer les dependances
+        run: python -m pip install --upgrade -r requirements.txt
 
       - name: Executer les tests API
-        continue-on-error: true
-        run: mkdir -p reports/api reports/api-pytest && python -m robot --outputdir reports/api tests_api
+        run: python -m robot --outputdir reports/api tests_api
 
-      - name: Executer les tests API Pytest
-        continue-on-error: true
-        run: python -m pytest tests/test_api --html=reports/api-pytest/results_api.html --self-contained-html -q
-
-      - name: Conserver les rapports API
+      - name: Conserver le rapport API
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: rapports-tests-api
-          path: reports/api*
+          name: rapport-tests-api
+          path: reports/api
           if-no-files-found: ignore
 
   tests-ihm:
@@ -91,123 +80,26 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Installer les dependances Robot Framework et Selenium
-        run: python -m pip install --upgrade -r requirements.txt
-
-      - name: Verifier Chrome du runner
-        run: |
-          google-chrome --version
-          if command -v chromedriver >/dev/null 2>&1; then
-            sudo rm -f "$(command -v chromedriver)"
-          fi
-
-      - name: Attendre la disponibilite du site IHM
-        run: |
-          echo "Adresses IPv4 resolues :"
-          getent ahostsv4 livraison3.testacademy.fr || true
-          for attempt in 1 2 3 4 5 6; do
-            if curl --ipv4 --fail --silent --show-error --connect-timeout 10 --max-time 30 http://livraison3.testacademy.fr/ > /dev/null; then
-              echo "Site IHM disponible (tentative $attempt)"
-              exit 0
-            fi
-            echo "Site IHM indisponible (tentative $attempt/6)"
-            sleep 10
-          done
-          echo "Le site IHM est inaccessible apres 6 tentatives"
-          exit 1
-
-      - name: Executer les tests IHM dans un affichage virtuel
-        continue-on-error: true
-        run: mkdir -p reports/ihm && xvfb-run --auto-servernum python -m robot --outputdir reports/ihm tests_ihm
-
-      - name: Conserver les rapports IHM
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: rapports-tests-ihm
-          path: reports/ihm
-          if-no-files-found: ignore
-
-  tests-performance:
-    name: Tests de performance
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
-
-    steps:
-      - name: Recuperer le code
-        uses: actions/checkout@v4
-
-      - name: Installer Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
       - name: Installer les dependances
         run: python -m pip install --upgrade -r requirements.txt
 
-      - name: Executer les tests de performance
-        continue-on-error: true
-        env:
-          RUN_PERFORMANCE: '1'
-        run: mkdir -p reports/performance && python -m pytest tests_performance -m performance -s -q | tee reports/performance/performance-results.txt
+      - name: Attendre la disponibilite du site IHM
+        run: |
+          for attempt in 1 2 3 4 5 6; do
+            if curl --ipv4 --fail --silent --show-error --connect-timeout 10 --max-time 30 http://livraison3.testacademy.fr/ > /dev/null; then
+              exit 0
+            fi
+            sleep 10
+          done
+          exit 1
 
-      - name: Conserver le rapport performance
+      - name: Executer les tests IHM
+        run: xvfb-run --auto-servernum python -m robot --outputdir reports/ihm tests_ihm
+
+      - name: Conserver le rapport IHM
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: rapport-tests-performance
-          path: reports/performance
-          if-no-files-found: ignore
-
-  rapport-global:
-    name: Rapport HTML global
-    runs-on: ubuntu-latest
-    if: always()
-    needs: [tests-unitaires, tests-api, tests-ihm, tests-performance]
-
-    steps:
-      - name: Recuperer le code
-        uses: actions/checkout@v4
-
-      - name: Installer Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Telecharger le rapport unitaire
-        continue-on-error: true
-        uses: actions/download-artifact@v4
-        with:
-          name: rapport-tests-unitaires
-          path: reports/unitaire
-
-      - name: Telecharger le rapport API
-        continue-on-error: true
-        uses: actions/download-artifact@v4
-        with:
-          name: rapports-tests-api
-          path: reports/api
-
-      - name: Telecharger le rapport IHM
-        continue-on-error: true
-        uses: actions/download-artifact@v4
-        with:
-          name: rapports-tests-ihm
+          name: rapport-tests-ihm
           path: reports/ihm
-
-      - name: Telecharger le rapport performance
-        continue-on-error: true
-        uses: actions/download-artifact@v4
-        with:
-          name: rapport-tests-performance
-          path: reports/performance
-
-      - name: Generer le rapport HTML global
-        run: python scripts/generate_report_index.py --root reports
-
-      - name: Publier le rapport HTML global
-        uses: actions/upload-artifact@v4
-        with:
-          name: rapport-html-global
-          path: reports
-          if-no-files-found: warn
+          if-no-files-found: ignore

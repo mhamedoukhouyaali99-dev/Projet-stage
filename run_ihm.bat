@@ -1,7 +1,12 @@
 @echo off
+set "ROOT=%~dp0"
+pushd "%ROOT%"
+
 echo Lancement des tests IHM...
 
-if not exist results\ihm mkdir results\ihm
-python -m robot --outputdir results\ihm tests_ihm
+if not exist "%ROOT%results\ihm" mkdir "%ROOT%results\ihm"
+python -m robot --outputdir "%ROOT%results\ihm" "%ROOT%tests_ihm"
+set "test_error=%errorlevel%"
 
-exit /b %errorlevel%
+popd
+exit /b %test_error%
