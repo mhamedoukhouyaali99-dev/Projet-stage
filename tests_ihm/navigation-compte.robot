@@ -11,7 +11,6 @@ Acces Au Portefeuille                   /index.php/wallet-2/
 Acces Aux Favoris                       /index.php/favorites/
 Acces Aux Factures                      /index.php/invoices/
 Acces Aux Messages                      /index.php/messages/
-Acces A La Verification Du Profil       /index.php/profile/?dpage=verification
 Acces Au Changement De Mot De Passe     /index.php/profile/?dpage=password-reset
 Acces Au Moyen De Paiement               /index.php/profile/?dpage=payment-method
 
