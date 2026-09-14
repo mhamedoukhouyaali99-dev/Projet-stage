@@ -3,7 +3,8 @@ Library    Selenium2Library
 
 *** Variables ***
 ${URL}    http://livraison3.testacademy.fr
-${NAVIGATEUR}    Edge
+${NAVIGATEUR}    Chrome
+${OPTIONS_CHROME}    add_argument("--headless=new"); add_argument("--no-sandbox"); add_argument("--disable-dev-shm-usage"); add_argument("--window-size=1920,1080")
 ${LIEN SE CONNECTER}    xpath=//a[contains(text(),'Se connecter')]
 ${LIEN SE DECONNECTER}    xpath=(//a[contains(text(),'Se déconnecter')])[3]
 ${CHAMP NOM UTILISATEUR}    name=username
@@ -16,7 +17,7 @@ ${TITRE PAGE TABLEAU DE BORD}    Tableau de bord - Livraison 3
 
 *** Keywords ***
 Ouvrir Le Navigateur Et Accéder A L'Application
-    Open Browser    ${URL}     ${NAVIGATEUR}
+    Open Browser    ${URL}     ${NAVIGATEUR}    options=${OPTIONS_CHROME}
     Maximize Browser Window
 
 Accéder A La Page De Connexion
