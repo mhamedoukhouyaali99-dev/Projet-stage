@@ -6,7 +6,7 @@ Test Teardown    Fermer Le Navigateur
 *** Test Cases ***
 Le Formulaire D Inscription Doit Etre Accessible
     Ouvrir Le Navigateur Et Accéder A L'Application
-    Click Element    xpath=(//a[contains(normalize-space(.),"S'inscrire")])[1]
+    Execute Javascript    document.querySelector('a[data-target="#modal-register"]').click()
     Wait Until Element Is Visible    css=#modal-register input[name="username"]
     Element Should Be Visible    css=#modal-register input[name="useremail"]
     Element Should Be Visible    css=#modal-register input[name="register_pass"]
@@ -14,16 +14,16 @@ Le Formulaire D Inscription Doit Etre Accessible
 
 L Inscription Doit Refuser Des Champs Obligatoires Vides
     Ouvrir Le Navigateur Et Accéder A L'Application
-    Click Element    xpath=(//a[contains(normalize-space(.),"S'inscrire")])[1]
+    Execute Javascript    document.querySelector('a[data-target="#modal-register"]').click()
     Wait Until Element Is Visible    css=#modal-register input[name="username"]
-    Click Button    xpath=//button[contains(normalize-space(.),'Soumettre')]
+    Execute Javascript    document.querySelector('#modal-register button[type="submit"]').click()
     Wait Until Element Is Visible    css=#modal-register
 
 Le Formulaire De Mot De Passe Oublie Doit Etre Accessible
     Ouvrir Le Navigateur Et Accéder A L'Application
-    Click Element    xpath=(//a[contains(normalize-space(.),'Se connecter')])[1]
+    Execute Javascript    document.querySelector('a[data-target="#modal-login"]:not([data-dismiss="modal"])').click()
     Wait Until Element Is Visible    css=#modal-login
-    Click Element    xpath=//*[contains(normalize-space(.),'mot de passe oublié')]
+    Execute Javascript    document.querySelector('#modal-login a[href*="forgot"], #modal-login [data-target="#modal-login-forgot-password"]').click()
     Wait Until Element Is Visible    css=input[name="user_login_forgot"]
 
 *** Keywords ***

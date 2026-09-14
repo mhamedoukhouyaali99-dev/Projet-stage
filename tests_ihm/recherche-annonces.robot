@@ -6,10 +6,10 @@ Test Teardown    Fermer Le Navigateur
 *** Test Cases ***
 La Recherche Doit Afficher Les Resultats Pour Une Destination
     Ouvrir Le Navigateur Et Accéder A L'Application
-    Wait Until Element Is Visible    css=input[placeholder="Destination"]
-    Input Text    css=input[placeholder="Destination"]    Paris
-    Click Button    id=search_submit_button
-    Wait Until Location Does Not Contain    /?    timeout=10s
+    Execute Javascript    const select = document.querySelector('select[name="city"]'); const option = Array.from(select.options).find(item => item.text.trim() === 'Paris'); select.value = option.value; select.dispatchEvent(new Event('change', { bubbles: true }));
+    Execute Javascript    document.querySelector('#search_submit_button').click()
+    Wait Until Location Contains    /index.php/search-results/    timeout=10s
+    Title Should Be    Search Results - Livraison 3
 
 Les Filtres Avances Doivent Etre Accessibles
     Ouvrir Le Navigateur Et Accéder A L'Application

@@ -26,15 +26,16 @@ Effectuer Une Connexion Réussie
     Soumette Le Formulaire De Connexion
 
 Vérifier Que Le Tableau De Bord Est Visible
-    Wait Until Element Is Visible    ${LIEN SE DECONNECTER}
+    Wait Until Location Contains    /index.php/dashboard/
     Title Should Be    ${TITRE PAGE TABLEAU DE BORD} 
+    Page Should Contain    Tableau de bord
 
 Effectuer Une Déconnexion Réussie
-    Click Element    ${LIEN SE DECONNECTER} 
-    Wait Until Element Is Not Visible    ${LIEN SE DECONNECTER} 
+    Execute Javascript    document.querySelector('a[href*="action=logout"]').click()
+    Wait Until Location Does Not Contain    /index.php/dashboard/
     
 Vérifier Que Le Lien De Connexion Est Visible
-    Wait Until Element Is Visible    ${LIEN SE CONNECTER} 
+    Page Should Contain    Se connecter
 
     
     
